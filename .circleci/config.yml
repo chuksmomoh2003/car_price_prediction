@@ -11,6 +11,8 @@ jobs:
     executor: python-executor
     steps:
       - checkout
+      - setup_remote_docker:  # Add this to set up Docker
+          version: 20.10.7     # Version of Docker
       - run:
           name: Install dependencies
           command: |
@@ -25,7 +27,8 @@ jobs:
     executor: python-executor
     steps:
       - checkout
-      - setup_remote_docker
+      - setup_remote_docker:  # Setup Docker here as well for pushing the image
+          version: 20.10.7
       - run:
           name: Authenticate to Google Artifact Registry
           command: |
@@ -65,5 +68,6 @@ workflows:
       - deploy:
           requires:
             - push-docker-image
+
 
 
