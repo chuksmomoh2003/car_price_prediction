@@ -1,14 +1,14 @@
 version: 2.1
 
 executors:
-  python-executor:
+  gcloud-executor:
     docker:
-      - image: circleci/python:3.10
+      - image: google/cloud-sdk:slim  # Prebuilt image with gcloud and kubectl
     working_directory: ~/repo
 
 jobs:
   build:
-    executor: python-executor
+    executor: gcloud-executor
     steps:
       - checkout
       - run:
@@ -22,7 +22,7 @@ jobs:
           command: docker build -t car-price:v2 .
 
   push-docker-image:
-    executor: python-executor
+    executor: gcloud-executor
     steps:
       - checkout
       - setup_remote_docker
@@ -40,17 +40,12 @@ jobs:
           command: docker push us-central1-docker.pkg.dev/hypnotic-guard-436705-n3/car-price/car-price:v2
 
   deploy:
-    executor: python-executor
+    executor: gcloud-executor
     steps:
       - run:
-          name: Install gcloud and kubectl
+          name: Authenticate to GKE
           command: |
-            echo "Installing Google Cloud SDK..."
-            echo "If you want to re-run this step, remember to clear the cache to avoid conflicts with existing installations."
             echo $GCLOUD_SERVICE_KEY | base64 --decode -i > ${HOME}/gcloud-service-key.json
-            curl https://sdk.cloud.google.com | bash -s -- --disable-prompts --quiet
-            source ${HOME}/google-cloud-sdk/path.bash.inc
-            gcloud components install kubectl --quiet
             gcloud auth activate-service-account --key-file=${HOME}/gcloud-service-key.json
             gcloud config set project YOUR_PROJECT_ID
             gcloud container clusters get-credentials YOUR_CLUSTER_NAME --region YOUR_CLUSTER_REGION
@@ -70,5 +65,6 @@ workflows:
             - build
       - deploy:
           requires:
-            - push-docker
+            - push-docker-image
+
 
