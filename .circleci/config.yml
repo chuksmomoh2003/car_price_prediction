@@ -3,7 +3,7 @@ version: 2.1
 executors:
   gcloud-executor:
     docker:
-      - image: google/cloud-sdk:slim  # Prebuilt image with gcloud and kubectl
+      - image: google/cloud-sdk:slim  # Prebuilt image with gcloud and kubectl already included
     working_directory: ~/repo
 
 jobs:
@@ -44,30 +44,13 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Authenticate to GKE and Suppress Prompts
+          name: Authenticate to GKE
           command: |
             echo $GCLOUD_SERVICE_KEY | base64 --decode -i > ${HOME}/gcloud-service-key.json
             gcloud auth activate-service-account --key-file=${HOME}/gcloud-service-key.json
             gcloud config set project YOUR_PROJECT_ID
-            gcloud config set disable_prompts True  # Disable prompts entirely
-            gcloud container clusters get-credentials car-price-prediction --region us-central1 --quiet
-      - run:
-          name: Update Kubernetes deployment
-          command: |
-            DOCKER_TAG=$(docker images car-price:v2 --format '{{.Tag}}')
-            kubectl set image deployment/car-price-predictor-deployment car-price-container=us-central1-docker.pkg.dev/hypnotic-guard-436705-n3/car-price/car-price:${DOCKER_TAG}
+            gcloud container clusters
 
-workflows:
-  version: 2
-  build-and-deploy:
-    jobs:
-      - build
-      - push-docker-image:
-          requires:
-            - build
-      - deploy:
-          requires:
-            - push-docker-image
 
 
 
