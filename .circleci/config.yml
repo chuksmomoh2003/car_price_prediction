@@ -1,14 +1,17 @@
 version: 2.1
 
+orbs:
+  gcp-gke: circleci/gcp-gke@0.4.0  # Use CircleCI's GCP GKE orb to simplify GKE deployment
+
 executors:
-  gcloud-executor:
+  python-executor:
     docker:
-      - image: google/cloud-sdk:slim  # Prebuilt image with gcloud and kubectl already included
+      - image: circleci/python:3.10
     working_directory: ~/repo
 
 jobs:
   build:
-    executor: gcloud-executor
+    executor: python-executor
     steps:
       - checkout
       - run:
@@ -22,7 +25,7 @@ jobs:
           command: docker build -t car-price:v2 .
 
   push-docker-image:
-    executor: gcloud-executor
+    executor: python-executor
     steps:
       - checkout
       - setup_remote_docker
@@ -40,16 +43,31 @@ jobs:
           command: docker push us-central1-docker.pkg.dev/hypnotic-guard-436705-n3/car-price/car-price:v2
 
   deploy:
-    executor: gcloud-executor
+    executor: python-executor
     steps:
       - checkout
+      - gcp-gke/install  # Install kubectl and authenticate GKE access using the Google Cloud Orb
+      - gcp-gke/get-credentials:
+          cluster-name: "car-price-prediction"
+          location: "us-central1"
       - run:
-          name: Authenticate to GKE
+          name: Update Kubernetes deployment
           command: |
-            echo $GCLOUD_SERVICE_KEY | base64 --decode -i > ${HOME}/gcloud-service-key.json
-            gcloud auth activate-service-account --key-file=${HOME}/gcloud-service-key.json
-            gcloud config set project YOUR_PROJECT_ID
-            gcloud container clusters
+            DOCKER_TAG=$(docker images car-price:v2 --format '{{.Tag}}')
+            kubectl set image deployment/car-price-deployment car-price-container=us-central1-docker.pkg.dev/hypnotic-guard-436705-n3/car-price/car-price:${DOCKER_TAG}
+
+workflows:
+  version: 2
+  build-and-deploy:
+    jobs:
+      - build
+      - push-docker-image:
+          requires:
+            - build
+      - deploy:
+          requires:
+            - push-docker-image
+
 
 
 
