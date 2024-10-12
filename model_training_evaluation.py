@@ -48,18 +48,17 @@ pipeline = Pipeline(steps=[
     ('feature_engineering', FunctionTransformer(feature_engineering, validate=False)),  # Apply feature engineering
     ('preprocessor', preprocessor),  # Apply preprocessing (OneHotEncoder)
     ('model', LGBMRegressor(
-        objective='regression',
-        metric='mse',
-        n_jobs=-1,
-        random_state=101,
-        n_estimators=1932,
-        num_leaves=18,
-        min_child_samples=25,
-        learning_rate=0.009270894888704539,
-        max_bin=2**10,
-        colsample_bytree=0.5274395821304206,
-        reg_alpha=0.008493713626609325,
-        reg_lambda=0.005910984041619941
+    objective='regression',
+    metric='mse',
+    n_jobs=-1,
+    random_state=101,
+    n_estimators=546,
+    num_leaves=49,
+    min_child_samples=2,
+    learning_rate=0.01340213629132974,
+    colsample_bytree=0.3742613512959107,
+    reg_alpha=0.03411846537405745,
+    reg_lambda=4.1425597420878315
     ))
 ])
 

@@ -49,8 +49,8 @@ stages:
     deps:
     - path: model_training_evaluation.py
       hash: md5
-      md5: f1cff0d9d466c5a5f1471b61c285415b
-      size: 3373
+      md5: 3a3fe9ef8842f067f360f61014118a40
+      size: 3300
     - path: processed_hyundi.csv
       hash: md5
       md5: 4d964ed30989bf0dda325593dfd2a337
@@ -58,9 +58,9 @@ stages:
     outs:
     - path: car_price_pipeline.pkl
       hash: md5
-      md5: 2968c880b52a19d127c6705de6b06658
-      size: 3318143
+      md5: bb195524bd764a4b3124d6cb591322b1
+      size: 2330880
     - path: evaluation_results.txt
       hash: md5
-      md5: b6a29b3aaa45d5878b4e475078f68495
+      md5: 032cd36c9903258f0d53d2f8cf2e3f05
       size: 101
