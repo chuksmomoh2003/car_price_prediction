@@ -45,15 +45,15 @@ jobs:
       - run:
           name: Install gcloud and kubectl
           command: |
-            curl https://sdk.cloud.google.com | bash -s -- --disable-prompts
-            source $HOME/google-cloud-sdk/path.bash.inc
-            gcloud components install kubectl --quiet
-      - run:
-          name: Authenticate to GKE
-          command: |
+            echo "Installing Google Cloud SDK..."
+            echo "If you want to re-run this step, remember to clear the cache to avoid conflicts with existing installations."
             echo $GCLOUD_SERVICE_KEY | base64 --decode -i > ${HOME}/gcloud-service-key.json
+            curl https://sdk.cloud.google.com | bash -s -- --disable-prompts --quiet
+            source ${HOME}/google-cloud-sdk/path.bash.inc
+            gcloud components install kubectl --quiet
             gcloud auth activate-service-account --key-file=${HOME}/gcloud-service-key.json
-            gcloud container clusters get-credentials car-price-prediction --region us-central1
+            gcloud config set project YOUR_PROJECT_ID
+            gcloud container clusters get-credentials YOUR_CLUSTER_NAME --region YOUR_CLUSTER_REGION
       - run:
           name: Update Kubernetes deployment
           command: |
@@ -70,4 +70,5 @@ workflows:
             - build
       - deploy:
           requires:
-            - push-docker-image
+            - push-docker
+
