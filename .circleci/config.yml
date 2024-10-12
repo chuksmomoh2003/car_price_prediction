@@ -3,14 +3,13 @@ version: 2.1
 executors:
   python-executor:
     docker:
-      - image: circleci/python:3.10  # Use CircleCI's Python image
+      - image: circleci/python:3.10
     working_directory: ~/repo
 
 jobs:
   build:
     executor: python-executor
     steps:
-      - setup_remote_docker  # Remote Docker setup
       - checkout
       - run:
           name: Install dependencies
@@ -20,20 +19,13 @@ jobs:
             pip install -r requirements.txt
       - run:
           name: Build Docker image
-          command: |
-            docker build -t car-price:v2 .  # Build Docker image
+          command: docker build -t car-price:v2 .
 
   push-docker-image:
     executor: python-executor
     steps:
-      - setup_remote_docker  # Continue with Remote Docker
       - checkout
-      - run:
-          name: Install Google Cloud SDK  # Install gcloud
-          command: |
-            curl https://sdk.cloud.google.com | bash
-            exec -l $SHELL
-            gcloud components install kubectl
+      - setup_remote_docker
       - run:
           name: Authenticate to Google Artifact Registry
           command: |
@@ -51,11 +43,11 @@ jobs:
     executor: python-executor
     steps:
       - run:
-          name: Install Google Cloud SDK  # Ensure gcloud is installed in deploy job as well
+          name: Install gcloud and kubectl
           command: |
-            curl https://sdk.cloud.google.com | bash
-            exec -l $SHELL
-            gcloud components install kubectl
+            curl https://sdk.cloud.google.com | bash -s -- --disable-prompts
+            source $HOME/google-cloud-sdk/path.bash.inc
+            gcloud components install kubectl --quiet
       - run:
           name: Authenticate to GKE
           command: |
@@ -79,15 +71,3 @@ workflows:
       - deploy:
           requires:
             - push-docker-image
-
-
-
-
-
-
-
-
-
-
-
-
