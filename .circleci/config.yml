@@ -1,23 +1,17 @@
 version: 2.1
 
 executors:
-  docker-executor:
+  python-executor:
     docker:
-      - image: circleci/python:3.10  # Use CircleCI's Docker image
-      - image: docker:19.03.12  # Use Docker in Docker (DinD) image for building
-
+      - image: circleci/python:3.10  # Using CircleCI's official Python image
     working_directory: ~/repo
-    environment:
-      DOCKER_HOST: tcp://localhost:2375  # Enable Docker-in-Docker
-      DOCKER_TLS_CERTDIR: ""  # Disable TLS for Docker-in-Docker
 
 jobs:
   build:
-    executor: docker-executor
+    executor: python-executor
     steps:
       - setup_remote_docker:
-          version: 19.03.12
-          docker_layer_caching: true
+          version: 20.10.7  # Use Docker version compatible with CircleCI's remote Docker
       - checkout
       - run:
           name: Install dependencies
@@ -30,8 +24,10 @@ jobs:
           command: docker build -t car-price:v2 .
 
   push-docker-image:
-    executor: docker-executor
+    executor: python-executor
     steps:
+      - setup_remote_docker:
+          version: 20.10.7
       - checkout
       - run:
           name: Authenticate to Google Artifact Registry
@@ -47,7 +43,7 @@ jobs:
           command: docker push us-central1-docker.pkg.dev/hypnotic-guard-436705-n3/car-price/car-price:v2
 
   deploy:
-    executor: docker-executor
+    executor: python-executor
     steps:
       - checkout
       - run:
@@ -73,6 +69,7 @@ workflows:
       - deploy:
           requires:
             - push-docker-image
+
 
 
 
