@@ -42,18 +42,19 @@ jobs:
   deploy:
     executor: gcloud-executor
     steps:
+      - checkout  # Ensures the latest code is pulled
       - run:
           name: Authenticate to GKE
           command: |
             echo $GCLOUD_SERVICE_KEY | base64 --decode -i > ${HOME}/gcloud-service-key.json
             gcloud auth activate-service-account --key-file=${HOME}/gcloud-service-key.json
             gcloud config set project YOUR_PROJECT_ID
-            gcloud container clusters get-credentials YOUR_CLUSTER_NAME --region YOUR_CLUSTER_REGION
+            gcloud container clusters get-credentials car-price-prediction --region us-central1
       - run:
           name: Update Kubernetes deployment
           command: |
             DOCKER_TAG=$(docker images car-price:v2 --format '{{.Tag}}')
-            kubectl set image deployment/car-price-deployment car-price-container=us-central1-docker.pkg.dev/hypnotic-guard-436705-n3/car-price/car-price:${DOCKER_TAG}
+            kubectl set image deployment/car-price-predictor-deployment car-price-container=us-central1-docker.pkg.dev/hypnotic-guard-436705-n3/car-price/car-price:${DOCKER_TAG}
 
 workflows:
   version: 2
@@ -66,5 +67,6 @@ workflows:
       - deploy:
           requires:
             - push-docker-image
+
 
 
