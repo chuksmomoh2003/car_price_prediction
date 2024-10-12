@@ -1,18 +1,17 @@
 version: 2.1
 
 executors:
-  docker-executor:
+  python-executor:
     docker:
       - image: circleci/python:3.10
     working_directory: ~/repo
 
 jobs:
   build:
-    executor: docker-executor
+    machine:  # Use machine executor to provide full Docker support
+      image: circleci/classic:edge
     steps:
       - checkout
-      - setup_remote_docker:  # Make sure Docker is set up remotely
-          version: 20.10.7
       - run:
           name: Install dependencies
           command: |
@@ -24,11 +23,10 @@ jobs:
           command: docker build -t car-price:v2 .
 
   push-docker-image:
-    executor: docker-executor
+    machine:  # Use machine executor here too
+      image: circleci/classic:edge
     steps:
       - checkout
-      - setup_remote_docker:  # Ensure Docker is configured remotely
-          version: 20.10.7
       - run:
           name: Authenticate to Google Artifact Registry
           command: |
@@ -43,7 +41,8 @@ jobs:
           command: docker push us-central1-docker.pkg.dev/hypnotic-guard-436705-n3/car-price/car-price:v2
 
   deploy:
-    executor: docker-executor
+    machine:  # Use machine executor to enable kubectl deployment
+      image: circleci/classic:edge
     steps:
       - run:
           name: Authenticate to GKE
@@ -68,6 +67,7 @@ workflows:
       - deploy:
           requires:
             - push-docker-image
+
 
 
 
