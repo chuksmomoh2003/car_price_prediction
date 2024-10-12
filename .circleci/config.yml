@@ -11,8 +11,11 @@ jobs:
     executor: python-executor
     steps:
       - checkout
-      - setup_remote_docker:  # Properly set up remote Docker
-          version: 20.10.7  # Specify a stable Docker version (update to match your needs)
+      - run:
+          name: Start Docker Daemon
+          command: |
+            sudo dockerd &
+            sleep 10  # Give Docker daemon time to initialize
       - run:
           name: Install dependencies
           command: |
@@ -27,8 +30,11 @@ jobs:
     executor: python-executor
     steps:
       - checkout
-      - setup_remote_docker:  # Properly set up remote Docker
-          version: 20.10.7
+      - run:
+          name: Start Docker Daemon
+          command: |
+            sudo dockerd &
+            sleep 10  # Give Docker daemon time to initialize
       - run:
           name: Authenticate to Google Artifact Registry
           command: |
@@ -46,8 +52,11 @@ jobs:
     executor: python-executor
     steps:
       - checkout
-      - setup_remote_docker:  # Properly set up remote Docker
-          version: 20.10.7
+      - run:
+          name: Start Docker Daemon
+          command: |
+            sudo dockerd &
+            sleep 10  # Give Docker daemon time to initialize
       - run:
           name: Authenticate to GKE
           command: |
@@ -71,6 +80,7 @@ workflows:
       - deploy:
           requires:
             - push-docker-image
+
 
 
 
