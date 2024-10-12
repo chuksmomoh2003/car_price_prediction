@@ -1,0 +1,27 @@
+stages:
+  prepare:
+    cmd: python data_prep.py
+    deps:
+      - hyundi.csv  # Your dataset
+      - data_prep.py  # Your data preparation script
+    outs:
+      - processed_hyundi.csv  # Output after data preparation
+
+  process:
+    cmd: python feature_prep.py
+    deps:
+      - processed_hyundi.csv  # The output from the previous stage
+      - feature_prep.py  # Feature engineering script
+    outs:
+      - features_hyundi.csv  # Processed/engineered features
+
+  train:
+    cmd: python model_training_evaluation.py
+    deps:
+      - features_hyundi.csv  # The processed feature data
+      - model_training_evaluation.py  # Model training and evaluation script
+    outs:
+      - model.joblib  # Trained model output
+      - evaluation_results.txt  # File containing evaluation metrics
+
+

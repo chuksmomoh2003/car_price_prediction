@@ -1,0 +1,66 @@
+schema: '2.0'
+stages:
+  prepare:
+    cmd: python data_prep.py
+    deps:
+    - path: data_prep.py
+      hash: md5
+      md5: 59f6d8490d2b77494cc6037a446ff160
+      size: 673
+    - path: hyundi.csv
+      hash: md5
+      md5: fab5751bbc94643b976f1957c05991a0
+      size: 245355
+    outs:
+    - path: processed_hyundi.csv
+      hash: md5
+      md5: 4d964ed30989bf0dda325593dfd2a337
+      size: 239176
+  process:
+    cmd: python feature_prep.py
+    deps:
+    - path: feature_prep.py
+      hash: md5
+      md5: c07f490f19092c8ccd5a49656a654e44
+      size: 2256
+    - path: processed_hyundi.csv
+      hash: md5
+      md5: 4d964ed30989bf0dda325593dfd2a337
+      size: 239176
+    outs:
+    - path: categorical_structure.joblib
+      hash: md5
+      md5: 415303e4503cb877a796787a5ee0696b
+      size: 1243
+    - path: columns_used.joblib
+      hash: md5
+      md5: 3d2675713db3cb84aa2ed237cc0534ce
+      size: 531
+    - path: encoder.joblib
+      hash: md5
+      md5: d05d9ed563071b19addb5340697be774
+      size: 645
+    - path: features_hyundi.csv
+      hash: md5
+      md5: 7bd4c781387032a8345552381a510ac0
+      size: 494757
+  train:
+    cmd: python model_training_evaluation.py
+    deps:
+    - path: model_training_evaluation.py
+      hash: md5
+      md5: f1cff0d9d466c5a5f1471b61c285415b
+      size: 3373
+    - path: processed_hyundi.csv
+      hash: md5
+      md5: 4d964ed30989bf0dda325593dfd2a337
+      size: 239176
+    outs:
+    - path: car_price_pipeline.pkl
+      hash: md5
+      md5: 2968c880b52a19d127c6705de6b06658
+      size: 3318143
+    - path: evaluation_results.txt
+      hash: md5
+      md5: b6a29b3aaa45d5878b4e475078f68495
+      size: 101

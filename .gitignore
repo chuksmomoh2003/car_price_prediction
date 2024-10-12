@@ -1,1 +1,10 @@
 /hyundi.csv
+/processed_hyundi.csv
+/features_hyundi.csv
+/model.joblib
+/evaluation_results.txt
+/car_price_predictor.pkl
+/encoder.joblib
+/columns_used.joblib
+/categorical_structure.joblib
+/car_price_pipeline.pkl
