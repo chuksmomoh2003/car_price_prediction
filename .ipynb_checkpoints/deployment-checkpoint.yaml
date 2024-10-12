@@ -39,7 +39,7 @@ spec:
   selector:
     app: car-price-predictor
 ---
-apiVersion: autoscaling/v2
+apiVersion: autoscaling/v2beta2
 kind: HorizontalPodAutoscaler
 metadata:
   name: car-price-predictor-hpa
@@ -57,5 +57,4 @@ spec:
         target:
           type: Utilization
           averageUtilization: 50  # Auto-scale when CPU utilization exceeds 50%
-
 
